@@ -1,0 +1,25 @@
+import os
+from openai import OpenAI
+from azure.identity import DefaultAzureCredential, get_bearer_token_provider 
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# Replace placeholders with your resource, project, and app names
+# BASE_URL = f"{os.getenv("FOUNDRY_PROJECT_ENDPOINT")}/applications/{os.getenv("FOUNDRY_AGENT_APPLICATION")}/protocols/openai"
+BASE_URL = f"{os.getenv("FOUNDRY_PROJECT_ENDPOINT")}/agents/{os.getenv("FOUNDRY_AGENT_APPLICATION")}/protocols/openai/responses"
+
+# Create OpenAI client authenticated with Azure credentials
+openai = OpenAI(
+    api_key=get_bearer_token_provider(DefaultAzureCredential(), "https://ai.azure.com/.default"),
+    base_url=BASE_URL,
+    default_query={"api-version": "2025-11-15-preview"}
+)
+
+# Send a request to the published agent
+response = openai.responses.create( 
+  input="Write a haiku", 
+) 
+print(f">> {response} <<")
+print(f"Response output: {response.output_text}")
