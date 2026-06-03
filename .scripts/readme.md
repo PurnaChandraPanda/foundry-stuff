@@ -11,5 +11,6 @@ gh auth login
 
 - run following script for every check-in
 ```
+gh auth login
 ./.scripts/git_push.sh "readme update"
 ```
