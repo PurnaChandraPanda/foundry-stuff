@@ -1,0 +1,8 @@
+name: agent-framework-agent-basicedf-responses
+template:
+    description: Hosted container agent using pre-built image eus2acr932.azurecr.io/agent-framework-agent-basicedf-responses:v3
+    kind: hosted
+    name: agent-framework-agent-basicedf-responses
+    protocols:
+        - protocol: responses
+          version: 2.0.0

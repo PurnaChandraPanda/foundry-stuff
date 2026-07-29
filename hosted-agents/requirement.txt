@@ -1,0 +1,10 @@
+agent-framework
+
+# for foundry agents hosting
+agent-framework-foundry-hosting
+
+# for langgraph agents hosting in foundry
+langchain-azure-ai
+langchain-azure-ai[tools]
+langchain-azure-ai[opentelemetry]
+langchain-azure-ai[hosting]

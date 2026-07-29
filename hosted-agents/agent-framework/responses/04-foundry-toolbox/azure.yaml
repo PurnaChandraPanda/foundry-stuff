@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: 04-foundry-toolbox
+services:
+    agent-framework-toolbox-responses:
+        project: ./src/agent-framework-agent-with-foundry-toolbox-responses
+        host: azure.ai.agent
+        language: python
+        uses:
+            - proj-default
+        codeConfiguration:
+            dependencyResolution: remote_build
+            entryPoint: main.py
+            runtime: python_3_13
+        container:
+            resources:
+                cpu: "0.5"
+                memory: 1Gi
+        environmentVariables:
+            - name: AZURE_AI_MODEL_DEPLOYMENT_NAME
+              value: ${AZURE_AI_MODEL_DEPLOYMENT_NAME}
+            - name: TOOLBOX_ENDPOINT
+              value: ${TOOLBOX_ENDPOINT}
+        kind: hosted
+        name: agent-framework-toolbox-responses
+        protocols:
+            - protocol: responses
+              version: 2.0.0
+    proj-default:
+        host: azure.ai.project
+        endpoint: ${FOUNDRY_PROJECT_ENDPOINT}
+infra:
+    provider: microsoft.foundry

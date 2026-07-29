@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: agent-framework-agent-basicdf-responses
+services:
+    agent-framework-agent-basicdf-responses:
+        project: src/agent-framework-agent-basicdf-responses
+        host: azure.ai.agent
+        language: docker
+        docker:
+            remoteBuild: true
+        uses:
+            - proj-default
+        container:
+            resources:
+                cpu: "0.5"
+                memory: 1Gi
+        description: Hosted container agent using pre-built image eus2acr932.azurecr.io/agent-framework-agent-basicdf-responses:v2
+        kind: hosted
+        name: agent-framework-agent-basicdf-responses
+        protocols:
+            - protocol: responses
+              version: 2.0.0
+    proj-default:
+        host: azure.ai.project
+        endpoint: ${FOUNDRY_PROJECT_ENDPOINT}
+infra:
+    provider: microsoft.foundry
