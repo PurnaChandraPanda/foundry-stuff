@@ -229,3 +229,6 @@ azd ai agent monitor --follow
 
 - After deployment, invoke the agent in the Agent Playground and stream live logs from the **Log Stream**. Navigate to **Traces** tab and watch the sequential execution happened in specification conversation session.
 
+## Deploy prompt agents
+
+- Follow the steps in [./tests/prompt_agents_mcp/](./tests/prompt_agents_mcp/readme.md) for ADO side connection handling in prompt agents.
