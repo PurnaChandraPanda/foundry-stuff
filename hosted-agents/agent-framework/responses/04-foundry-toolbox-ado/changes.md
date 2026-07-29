@@ -231,4 +231,4 @@ azd ai agent monitor --follow
 
 ## Deploy prompt agents
 
-- Follow the steps in [./tests/prompt_agents_mcp/](./tests/prompt_agents_mcp/readme.md) for ADO side connection handling in prompt agents.
+- Follow the steps in [./tests/prompt_agents_mcp/](./tests/prompt_agents_mcp/) for ADO side connection handling in prompt agents.
