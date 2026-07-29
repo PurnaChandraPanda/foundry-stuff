@@ -1,6 +1,6 @@
 - This hosted-agents is already a cloned repo of path [foundry-samples/samples/python/hosted-agents](https://github.com/microsoft-foundry/foundry-samples/tree/main/samples/python/hosted-agents).
 
-- In every child sample folder, there's a `change.md` file that explains code changes to follow.
+- In every child sample folder, there's a `changes.md` file that explains code changes to follow.
 
 ## work with venv
 
