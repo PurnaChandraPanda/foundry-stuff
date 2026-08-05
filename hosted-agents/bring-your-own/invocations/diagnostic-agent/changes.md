@@ -150,6 +150,7 @@ azd ai agent show diagnostic-agent-python-invocations
 # test the deployed agent
 azd ai agent invoke diagnostic-agent-python-invocations '{"message": "Hi"}'
 
+# remember to supply your endpoint hosts for foundry account/ cosmos db/ storage account/ search
 azd ai agent invoke diagnostic-agent-python-invocations '{"hosts":["aifoundry3738.services.ai.azure.com", "aifoundry3738.openai.azure.com", "aifoundry3738.cognitiveservices.azure.com", "aifoundry3738cosmosdb.documents.azure.com", "aifoundry3738storage.blob.core.windows.net", "aifoundry3738search.search.windows.net"],"public_hosts":["https://management.azure.com/metadata/endpoints?api-version=2020-09-01"],"resolvers": ["168.63.129.16"],"record_types": ["A", "AAAA"],"raw_dns": true,"include_container_info": true, "include_env_dump": true,"include_evidence": true,"stream": true,"tcp_timeout_sec": 5,"http_timeout_sec": 10,"dns_timeout_sec": 5}'
 
 
