@@ -87,7 +87,7 @@ TOKEN_SCOPE="api://2a72489c-aab2-4b65-b93a-a91edccf33b8" ./test_toolbox_endpoint
 # local validation for ado mcp
 ADO_TOKEN=$(az account get-access-token --resource https://mcp.dev.azure.com --query accessToken -o tsv)
 
-curl -i -X POST "https://mcp.dev.azure.com/is-smit" \
+curl -i -X POST "https://mcp.dev.azure.com/cssdevs" \
   -H "Authorization: Bearer $ADO_TOKEN" \
   -H "Content-Type: application/json" \
   -H "Accept: application/json, text/event-stream" \
