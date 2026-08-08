@@ -2,11 +2,10 @@
 
 """Foundry Skills hosted agent sample.
 
-At startup, this agent downloads each Foundry Skill named in
-``SKILL_NAMES`` from the project's ``beta.skills`` API, unpacks each
-one into a separate runtime directory under ``downloaded_skills/``, and wires
-that directory into a :class:`SkillsProvider` so the agent advertises the
-skills to the model and loads them on demand (progressive disclosure).
+The ``SKILL_SOURCE`` setting controls whether this agent loads the skills named
+in ``SKILL_NAMES`` from the deployment package or downloads them from the
+project's ``beta.skills`` API. The hosted deployment uses bundled skills so
+network calls do not block its readiness endpoint.
 
 Upload the skills to Foundry once with ``provision_skills.py`` before running
 this sample.
@@ -17,6 +16,7 @@ import io
 import logging
 import os
 import shutil
+import tempfile
 import zipfile
 from pathlib import Path
 from typing import Final
@@ -30,11 +30,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Runtime directory where skills downloaded from Foundry are unpacked.
-# Kept separate from the static ``skills/`` source folder so the two never
-# get confused: the source folder is the input to ``provision_skills.py``
-# and the runtime folder is the output of this script's bootstrap step.
-DOWNLOADED_SKILLS_DIR: Final = Path(__file__).parent / "downloaded_skills"
+# Hosted agents mount the application directory read-only. Keep downloaded
+# skills in the platform's writable, ephemeral temp directory instead.
+DOWNLOADED_SKILLS_DIR: Final = Path(tempfile.gettempdir()) / "foundry-skills" / "downloaded_skills"
+BUNDLED_SKILLS_DIR: Final = Path(__file__).parent / "skills"
 
 logger = logging.getLogger(__name__)
 
@@ -89,6 +88,19 @@ def _resolved_env(name: str) -> str:
     return value
 
 
+def _bundled_skill_paths(skill_names: list[str]) -> list[Path]:
+    """Resolve requested bundled skills and reject missing or unsafe names."""
+    skill_paths = []
+    for name in skill_names:
+        if Path(name).name != name:
+            raise ValueError(f"Invalid skill name {name!r}; expected a directory name.")
+        skill_path = BUNDLED_SKILLS_DIR / name
+        if not (skill_path / "SKILL.md").is_file():
+            raise FileNotFoundError(f"Bundled skill {name!r} was not found under '{BUNDLED_SKILLS_DIR}'.")
+        skill_paths.append(skill_path)
+    return skill_paths
+
+
 # Hard ceiling on the skill-bootstrap network round-trips so a slow or hung
 # Foundry beta.skills API call can't keep ``/readiness`` from returning 200
 # past the hosted-agent runtime's session-readiness timeout.
@@ -98,11 +110,20 @@ SKILL_BOOTSTRAP_TIMEOUT_SECONDS: Final = 60.0
 async def main() -> None:
     project_endpoint = os.environ["FOUNDRY_PROJECT_ENDPOINT"]
     skill_names = [name.strip() for name in _resolved_env("SKILL_NAMES").split(",") if name.strip()]
+    skill_source = _resolved_env("SKILL_SOURCE") or "foundry"
 
     context_providers = []
     if not skill_names:
         logger.warning("SKILL_NAMES is empty; no skills will be loaded into the agent.")
-    else:
+    elif skill_source == "bundled":
+        skill_paths = _bundled_skill_paths(skill_names)
+        logger.info("Loading bundled skills: %s", ", ".join(skill_names))
+        context_providers.append(
+            SkillsProvider.from_paths(
+                skill_paths=skill_paths, 
+                # disable approval for load_skill
+                disable_load_skill_approval=True,))
+    elif skill_source == "foundry":
         # Pull the latest copy of each skill from Foundry into a runtime-only folder.
         await asyncio.wait_for(
             _bootstrap_skills(project_endpoint, skill_names, DOWNLOADED_SKILLS_DIR),
@@ -114,8 +135,12 @@ async def main() -> None:
         # tool the model uses to retrieve the full SKILL.md body on demand. No
         # script_runner is configured because the skills in this sample are
         # instruction-only.
-        skills_provider = SkillsProvider.from_paths(skill_paths=str(DOWNLOADED_SKILLS_DIR))
+        skills_provider = SkillsProvider.from_paths(
+                                skill_paths=str(DOWNLOADED_SKILLS_DIR),
+                                disable_load_skill_approval=True,)
         context_providers.append(skills_provider)
+    else:
+        raise ValueError("SKILL_SOURCE must be either 'bundled' or 'foundry'.")
 
     async with DefaultAzureCredential() as credential:
         client = FoundryChatClient(

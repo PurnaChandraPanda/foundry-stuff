@@ -80,15 +80,16 @@ def main():
         credential=DefaultAzureCredential(),
     )
 
-    ## With skills approval disabled, agent automatically executes the travel-guide skill 
-    ## when a user asks for a PDF travel guide, city guide, itinerary, or trip-planning document.
+    ## With skills approval enabled, agent will be popped up with approval dialogs \
+    ## before executing the travel-guide skill when a user asks for a PDF travel guide, \
+    ## city guide, itinerary, or trip-planning document.
     ### load_skill → run_skill_script → final PDF response
     skills_provider = SkillsProvider.from_paths(
         skill_paths=Path(__file__).parent / "skills",
         script_runner=run_local_skill_script,
-        disable_load_skill_approval=True,
-        disable_read_skill_resource_approval=True,
-        disable_run_skill_script_approval=True,
+        disable_load_skill_approval=False,
+        disable_read_skill_resource_approval=False,
+        disable_run_skill_script_approval=False,
     )
 
     agent = Agent(

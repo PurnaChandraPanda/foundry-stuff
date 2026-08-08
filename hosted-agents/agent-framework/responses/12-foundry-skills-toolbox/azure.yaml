@@ -1,8 +1,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
 
-name: 12-foundry-skills
+name: 12-foundry-skills-toolbox
 services:
-    agent-framework-agent-foundry-skills-responses:
+    agent-framework-agent-toolbox-skills-responses:
         project: ./src/agent-framework-agent-foundry-skills-responses
         host: azure.ai.agent
         language: python
@@ -10,8 +10,7 @@ services:
             - proj-default
         env:
             AZURE_AI_MODEL_DEPLOYMENT_NAME: ${AZURE_AI_MODEL_DEPLOYMENT_NAME}
-            SKILL_NAMES: ${SKILL_NAMES}
-            SKILL_SOURCE: ${SKILL_SOURCE}
+            TOOLBOX_ENDPOINT: ${TOOLBOX_ENDPOINT}
         codeConfiguration:
             dependencyResolution: remote_build
             entryPoint: main.py
@@ -21,7 +20,7 @@ services:
                 cpu: "0.5"
                 memory: 1Gi
         kind: hosted
-        name: agent-framework-agent-foundry-skills-responses
+        name: agent-framework-agent-toolbox-skills-responses
         protocols:
             - protocol: responses
               version: 2.0.0
