@@ -122,6 +122,22 @@ agent = Assistant(
 )
 ```
 
+For installed version `qwen-agent==0.0.34`, the registered types are:
+
+- `oai` — text, OpenAI-compatible
+- `qwenvl_oai` — vision, OpenAI-compatible
+- `qwenomni_oai` — multimodal/omni, OpenAI-compatible
+- `azure` — Azure OpenAI
+- `qwen_dashscope`
+- `qwenvl_dashscope`
+- `qwenaudio_dashscope`
+- `qwenvlo_dashscope`
+- `transformers`
+- `openvino`
+
+The repo [qwen_agent/llm/](https://github.com/QwenLM/Qwen-Agent/blob/main/qwen_agent/llm/__init__.py#L20_) gives more idea about `model_type` support with `qwen-agent` caller library.
+
+
 ## Critical zoom technique
 
 The key to the zoom objective is to crop the selected region in Python and
