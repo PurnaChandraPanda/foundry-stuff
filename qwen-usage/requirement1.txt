@@ -1,0 +1,5 @@
+# for qwen-agent usage
+qwen-agent[python-executor]
+soundfile
+
+azure-identity

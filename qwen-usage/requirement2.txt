@@ -1,0 +1,4 @@
+# for maf usage
+agent-framework
+
+pillow
