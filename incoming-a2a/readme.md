@@ -40,30 +40,32 @@ python 4.a2a_client_prompt_agent.py
 
 - Create an A2A connection to the target agent
 
+```
 -> The connection stores the target agent's A2A endpoint URL and authentication details. 
 -> For a Foundry agent target, don't set an agent card path. 
 -> Foundry resolves the default agent card path automatically and negotiates the A2A protocol version for you.
 -> Over here, "authType" is set as "AgenticIdentityToken". It means caller agent's ID would be used to used to reach the destination agent.
-
 ```
+
+```bash
 ./5.create_remote_a2a_connection_agent.sh
 ```
 
 - Create the calling agent with the A2A tool
 
-```
+```bash
 python 6.create_caller_prompt_agent.py
 ```
 
 - Assign the caller agent with `Foundry Agent Consumer` role as a2a target connection created to follow `Microsoft Entra Agent Identity` authentication. It means caller agent's ID will be used to reach destination agent.
 
-```
+```bash
 ./6.1.assign-caller-agent-consumer-role.sh
 ```
 
 - Run the calling agent
 
-```
+```bash
 python 7.run_caller_agent.py
 ```
 
