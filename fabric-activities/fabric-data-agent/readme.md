@@ -3,6 +3,7 @@ Following doc [/tools/fabric/](https://learn.microsoft.com/en-us/azure/foundry/a
 - Create a Foundry prompt agent with Fabric data agent tool: `create_fabric_prompt_agent.py`
 - Run that created agent: `run_fabric_prompt_agent.py`
 - Agent Framework local agent sample: `fabric_local_agent.py`
+- Sequential workflow (analyst -> reviewer) as one agent: `fabric_sequential_workflow_agent.py`
 - Troubleshoot the Fabric wiring: `diagnose_fabric_connection.py`
 - Foundry **hosted** agent (Responses protocol): [`hosted-agent/`](./hosted-agent/readme.md)
 
@@ -113,6 +114,42 @@ Local Agent Framework sample:
 ```bash
 python fabric_local_agent.py
 ```
+
+## Sequential workflow as an agent
+
+`fabric_sequential_workflow_agent.py` chains two participants with
+`SequentialBuilder` and exposes the whole chain through `workflow.as_agent()`,
+following the [public sample](https://github.com/microsoft/agent-framework/blob/main/python/samples/03-workflows/agents/sequential_workflow_as_agent.py):
+
+```
+analyst (Fabric tool) -> reviewer (no tool)
+```
+
+Only `analyst` holds the Fabric tool. `reviewer` sees the analyst's reply as its
+input and condenses it, so it cannot introduce data the analyst did not return.
+
+```bash
+python fabric_sequential_workflow_agent.py
+python fabric_sequential_workflow_agent.py --query "what is the average trip distance"
+python fabric_sequential_workflow_agent.py --stream
+```
+
+Built with `intermediate_output_from=[analyst]`. Without it, `as_agent()`
+returns **only** the last participant's message, so the grounded numbers the
+review rests on would not appear in the response. Intermediate output arrives as
+`text_reasoning` content while `.text` stays terminal-output only - which is why
+the script prints the message list and the final text separately.
+
+`--stream` calls `agent.run(query, stream=True)` and prints chunks as they are
+produced instead of waiting for the whole chain. Every chunk is an
+`AgentResponseUpdate` tagged with `author_name` (the workflow falls back to the
+executor id, so it is always populated), which is what the script uses to print
+a `[analyst]` / `[reviewer]` header whenever the author changes. Non-text
+contents - the Fabric tool call and its result - are announced as `<type>`
+markers rather than dumped, since the tool payload is far larger than the
+answer.
+
+Uses the same `.env` as `fabric_local_agent.py`; no extra configuration.
 
 ## Foundry hosted agent
 
