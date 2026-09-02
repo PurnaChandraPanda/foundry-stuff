@@ -12,8 +12,8 @@ and runbook.
 Both are built against the same Fabric workspace and answer the same questions,
 so they are directly comparable.
 
-- `fabric-data-agent` follows [https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/fabric?pivots=python](/tools/fabric/)
-- `fabric-iq` follows [https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/fabric-iq?pivots=python](/tools/fabric-iq/)
+- `fabric-data-agent` follows [/tools/fabric/](https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/fabric?pivots=python)
+- `fabric-iq` follows [/tools/fabric-iq/](https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/fabric-iq?pivots=python)
 
 Each folder covers the same three shapes:
 
