@@ -1,0 +1,32 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: hosted-agent
+services:
+    fabric-iq-responses:
+        project: ./src/fabric-iq-responses
+        host: azure.ai.agent
+        language: python
+        uses:
+            - proj-default
+        env:
+            AZURE_AI_MODEL_DEPLOYMENT_NAME: ${AZURE_AI_MODEL_DEPLOYMENT_NAME}
+            FABRIC_IQ_TOOLBOX_NAME: ${FABRIC_IQ_TOOLBOX_NAME}
+            AZURE_AI_PROJECT_ENDPOINT: ${AZURE_AI_PROJECT_ENDPOINT}
+        codeConfiguration:
+            dependencyResolution: remote_build
+            entryPoint: main.py
+            runtime: python_3_13
+        container:
+            resources:
+                cpu: "0.5"
+                memory: 1Gi
+        kind: hosted
+        name: fabric-iq-responses
+        protocols:
+            - protocol: responses
+              version: 2.0.0
+    proj-default:
+        host: azure.ai.project
+        endpoint: ${AZURE_AI_PROJECT_ENDPOINT}
+infra:
+    provider: microsoft.foundry

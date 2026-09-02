@@ -1,0 +1,4 @@
+# pick the current pinned versions or later
+agent-framework-foundry==1.11.0
+agent-framework-foundry-hosting==1.0.0b260813
+azure-ai-projects==2.3.0

@@ -1,0 +1,7 @@
+# Excluded from the code-deploy ZIP (.gitignore syntax).
+# Hosted values come from the `env:` block in azure.yaml, so the local .env
+# must not be packaged.
+.env
+__pycache__/
+*.pyc
+.venv/
