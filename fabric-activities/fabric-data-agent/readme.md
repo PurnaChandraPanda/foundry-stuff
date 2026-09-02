@@ -1,4 +1,4 @@
-Following doc https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/fabric?pivots=python,
+Following doc [/tools/fabric/](https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/fabric?pivots=python)
 
 - Create a Foundry prompt agent with Fabric data agent tool: `create_fabric_prompt_agent.py`
 - Run that created agent: `run_fabric_prompt_agent.py`

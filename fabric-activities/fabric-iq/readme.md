@@ -1,6 +1,6 @@
 # Fabric IQ (MCP) with Foundry agents
 
-Following doc - [https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/fabric-iq?pivots=python](/tools/fabric-iq/)
+Following doc - [/tools/fabric-iq/](https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/fabric-iq?pivots=python)
 
 - Create the Fabric IQ project connection: `create_fabric_iq_connection.sh`
 - Troubleshoot the wiring: `diagnose_fabric_iq_connection.py`
