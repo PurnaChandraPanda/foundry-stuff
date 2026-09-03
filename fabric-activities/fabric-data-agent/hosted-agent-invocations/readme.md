@@ -1,12 +1,43 @@
-# Fabric data agent as a Foundry hosted agent
+# Fabric data agent as a Foundry hosted agent (invocations protocol)
 
-Deploys the Agent Framework agent from the parent folder as a **Foundry hosted agent** speaking the Responses protocol.
+Deploys the Agent Framework agent from the parent folder as a **Foundry hosted
+agent** speaking the **invocations** protocol.
 
-- [`src/fabric-dataagent-responses/main.py`](./src/fabric-dataagent-responses/main.py) - the agent, wrapped in `ResponsesHostServer`
+- [`src/fabric-dataagent-invocations/main.py`](./src/fabric-dataagent-invocations/main.py) - the agent, served by `InvocationAgentServerHost`
 - [`azure.yaml`](./azure.yaml) - azd project manifest
 - [`.agentignore`](./.agentignore) - excludes `.env` and caches from the deploy ZIP
 
 Run every command in this document **from this folder**, not the repo root.
+
+## Invocations vs Responses
+
+The sibling [`hosted-agent/`](../hosted-agent/readme.md) folder serves the same
+agent over the Responses protocol. The differences that affect the code:
+
+| | Responses | Invocations |
+| --- | --- | --- |
+| Host class | `ResponsesHostServer(agent)` | `InvocationAgentServerHost()` - takes **no** agent |
+| Wiring | agent passed to the constructor | `@app.invoke_handler` on a request handler |
+| Route | `POST /responses` | `POST /invocations` |
+| Wire shape | defined by the platform | defined by **your handler** |
+| History | managed by the platform | managed here, via `AgentSession` |
+| Caller identity | `get_request_context()` from agent middleware | `request.state.user_id` / `.session_id` / `.call_id` |
+
+Because the handler owns the wire shape, this sample accepts:
+
+```json
+{"message": "<question>", "stream": false}
+```
+
+and returns `{"response": "..."}`, or an SSE stream of text chunks when
+`"stream": true`.
+
+Session id is taken from `request.state.session_id`, which the runtime resolves
+from the `agent_session_id` query parameter, the `FOUNDRY_AGENT_SESSION_ID` env
+var, or a fresh UUID.
+
+> The in-memory `_sessions` dict is lost on restart and is not shared across
+> replicas. It is fine for a sample; use durable storage for anything real.
 
 ## Prerequisites
 
@@ -15,8 +46,11 @@ data agent must be **published**. See the [root readme](../readme.md) for how to
 create the connection and how to diagnose it.
 
 ```bash
-pip install -r src/fabric-dataagent-responses/requirements.txt
+pip install -r src/fabric-dataagent-invocations/requirements.txt
 ```
+
+`agent-framework-foundry-hosting` pulls in `azure-ai-agentserver-invocations`,
+which provides `InvocationAgentServerHost`; no extra dependency is needed.
 
 ## How this differs from `fabric_local_agent.py`
 
@@ -53,7 +87,7 @@ dropped:
 
 ## Configuration
 
-`src/fabric-dataagent-responses/.env`:
+`src/fabric-dataagent-invocations/.env`:
 
 ```bash
 # ARM resource id till foundry project level
@@ -76,7 +110,7 @@ requires permission to read project connections.
 
 ```bash
 # be in directory
-cd hosted-agent
+cd hosted-agent-invocations
 
 # Git Bash rewrites values starting with /subscriptions/... into
 # C:/Program Files/Git/subscriptions/... when launching a native Windows
@@ -85,12 +119,12 @@ export MSYS_NO_PATHCONV=1
 
 # read .env and login
 set -a
-source src/fabric-dataagent-responses/.env
+source src/fabric-dataagent-invocations/.env
 set +a
 
 az login --tenant "$TENANT_ID" --use-device-code
 
-python src/fabric-dataagent-responses/main.py
+python src/fabric-dataagent-invocations/main.py
 ```
 
 `main.py` calls `load_dotenv()` itself, so sourcing `.env` is only needed for
@@ -98,13 +132,24 @@ python src/fabric-dataagent-responses/main.py
 override variables already present in the environment - an exported (and
 possibly mangled) value wins over the file.
 
-It listens on `http://localhost:8088` (or `$PORT`). From another terminal:
+It listens on `http://localhost:8088` (or `$PORT`). The route is `/invocations`
+and the body shape is defined by `handle_invoke` in this sample, **not** by the
+platform. From another terminal:
 
 ```bash
-curl -X POST http://localhost:8088/responses \
+# non-streaming -> {"response": "..."}
+curl -X POST "http://localhost:8088/invocations?agent_session_id=demo" \
   -H "Content-Type: application/json" \
-  -d '{"conversation": {"id": "fabric-1"}, "input": "which month had highest travel rides and which month had lowest"}'
+  -d '{"message": "which month had highest travel rides and which month had lowest"}'
+
+# streaming -> SSE text chunks
+curl -N -X POST "http://localhost:8088/invocations?agent_session_id=demo" \
+  -H "Content-Type: application/json" \
+  -d '{"message": "and what was the total?", "stream": true}'
 ```
+
+Reusing the same `agent_session_id` keeps the conversation in the same
+`AgentSession`, so the follow-up question above has the first turn as context.
 
 ## 2. Wire up azd
 
@@ -116,7 +161,7 @@ change the agent name or the folder layout:
 export MSYS_NO_PATHCONV=1
 
 set -a
-source ./src/fabric-dataagent-responses/.env
+source ./src/fabric-dataagent-invocations/.env
 set +a
 
 : "${AZURE_AI_PROJECT_ID:?AZURE_AI_PROJECT_ID is missing}"
@@ -126,17 +171,18 @@ set +a
 azd auth login
 azd ai project set "$AZURE_AI_PROJECT_ENDPOINT"
 
-export AZD_ENV_NAME="fabric-agent-dev"
+export AZD_ENV_NAME="fabric-agentinv-dev"
 
 rm -rf azure.yaml
 
 azd ai agent init \
   --no-prompt --force \
-  --agent-name fabric-dataagent-responses \
+  --agent-name fabric-dataagent-invocations \
   -e "$AZD_ENV_NAME" \
+  --protocol invocations \
   --project-id "$AZURE_AI_PROJECT_ID" \
   --model-deployment "$AZURE_AI_MODEL_DEPLOYMENT_NAME" \
-  --src ./src/fabric-dataagent-responses \
+  --src ./src/fabric-dataagent-invocations \
   --deploy-mode code \
   --runtime python_3_13 \
   --entry-point main.py
@@ -175,7 +221,7 @@ azd ai agent run
 In another terminal:
 
 ```bash
-azd ai agent invoke --local "which month had highest travel rides and which month had lowest"
+azd ai agent invoke --local '{"message": "which month had highest travel rides and which month had lowest"}'
 ```
 
 ## 4. Deploy
@@ -190,7 +236,7 @@ azd deploy -e "$AZD_ENV_NAME"
 ## 5. Verify the deployed agent
 
 ```bash
-azd ai agent show fabric-dataagent-responses
+azd ai agent show fabric-dataagent-invocations
 ```
 
 ## 5.1. Invoke the deployed agent
@@ -200,11 +246,16 @@ azd ai agent show fabric-dataagent-responses
 azd ai agent monitor --follow
 
 # shell 2: invoke
-azd ai agent invoke fabric-dataagent-responses "which month had highest travel rides and which month had lowest"
+azd ai agent invoke fabric-dataagent-invocations '{"message": "which month had highest travel rides and which month had lowest"}'
 ```
 
 After deployment you can also invoke it from the Foundry **Agent Playground**,
 watch **Log Stream**, and inspect the per-session execution under **Traces**.
+
+> Unlike the Responses variant, this agent's request body is defined by
+> `handle_invoke` (`{"message": ..., "stream": ...}`), not by the platform. If
+> `azd ai agent invoke` sends a different shape, call the deployed
+> `/invocations` endpoint directly with the same `curl` used in step 1.
 
 ## Troubleshooting
 
@@ -225,14 +276,13 @@ This is unrelated to the agent code - the same failure hits local runs.
 
 ### `No CustomKeys connection found for AzureFabric`
 
-The deployed agent returns the output content with the HTTP call itself
+The deployed agent returns this inside the SSE stream while the HTTP call itself
 succeeds with `200 OK`. For some issues, the container never reaches Fabric at all.
 
 That matches how the tool works. `FoundryChatClient.get_fabric_tool()` returns a
 *declaration only*, with no callable - the container just names the connection.
 Foundry resolves it and calls Fabric server-side, so every part of the failure
 happens after the request leaves this code.
-
 
 The local samples in the parent folder work against the same connection, because
 a signed-in user produces a valid OBO token where the hosted agent's managed

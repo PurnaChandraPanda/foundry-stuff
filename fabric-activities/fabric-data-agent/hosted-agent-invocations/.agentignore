@@ -1,0 +1,12 @@
+# Never ship local secrets or caches in the deploy ZIP.
+.env
+.venv/
+__pycache__/
+*.pyc
+.azure/
+
+# Local scratch copies - keep on disk, never package.
+# NOTE: main_diag.py is deliberately NOT excluded. It is a valid alternate
+# entryPoint for debugging a deployed container, so it has to be in the ZIP.
+* copy.py
+*.bak

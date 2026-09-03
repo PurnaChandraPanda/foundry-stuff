@@ -1,0 +1,5 @@
+# pick the current pinned versions or later
+agent-framework-foundry==1.11.0
+# Pulls azure-ai-agentserver-invocations (>=1.1.0b1), which provides
+# InvocationAgentServerHost. Pinned to the version verified in .maf_venv.
+agent-framework-foundry-hosting==1.0.0b260821

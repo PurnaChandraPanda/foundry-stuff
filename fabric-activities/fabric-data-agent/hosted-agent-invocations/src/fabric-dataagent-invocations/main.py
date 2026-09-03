@@ -1,8 +1,23 @@
 """Foundry hosted agent that answers questions using a Microsoft Fabric data agent.
 
+Speaks the **invocations** protocol (not Responses): the hosting runtime posts to
+/invoke and this module owns the request/response shape, so conversation history
+is kept here in AgentSession rather than by the platform.
+
 Run locally:
-    python src/fabric-dataagent-responses/main.py
-    # serves the Responses protocol on http://localhost:8088
+    python src/fabric-dataagent-invocations/main.py
+    # serves the invocations protocol on http://localhost:8088
+
+    # The route is /invocations (not /invoke) -- verified from app.routes.
+    # Session id comes from the agent_session_id query param, else a fresh UUID.
+    curl -X POST "http://localhost:8088/invocations?agent_session_id=demo" \
+      -H "Content-Type: application/json" \
+      -d '{"message": "which month had highest travel rides and which month had lowest"}'
+
+    # streaming (SSE)
+    curl -N -X POST "http://localhost:8088/invocations?agent_session_id=demo" \
+      -H "Content-Type: application/json" \
+      -d '{"message": "and what was the total?", "stream": true}'
 
 Deployed:
     azd ai agent init ... && azd deploy
@@ -12,13 +27,16 @@ import json
 import logging
 import os
 import sys
+from collections.abc import AsyncGenerator
 
-from agent_framework import Agent
+from agent_framework import Agent, AgentSession
 from agent_framework.foundry import FoundryChatClient
-from agent_framework_foundry_hosting import ResponsesHostServer
+from azure.ai.agentserver.invocations import InvocationAgentServerHost
 from azure.ai.projects import AIProjectClient
 from azure.identity import DefaultAzureCredential
 from dotenv import load_dotenv
+from starlette.requests import Request
+from starlette.responses import JSONResponse, Response, StreamingResponse
 
 # Fabric responses contain citation markers (e.g. U+3010) that the default
 # Windows console encoding (cp1252) cannot encode, which would crash logging.
@@ -27,7 +45,7 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("fabric-dataagent-responses")
+logger = logging.getLogger("fabric-dataagent-invocations")
 
 load_dotenv()
 
@@ -78,6 +96,7 @@ def _resolve_connection_id() -> str:
     with AIProjectClient(endpoint=PROJECT_ENDPOINT, credential=_credential) as project:
         return project.connections.get(FABRIC_CONNECTION_NAME).id
 
+
 def build_agent() -> Agent:
     connection_id = _resolve_connection_id()
     logger.info("Using Fabric connection: %s", connection_id)
@@ -103,18 +122,83 @@ def build_agent() -> Agent:
     )
 
     return Agent(
-        name="fabric-dataagent-responses",
+        name="fabric-dataagent-invocations",
         client=chat_client,
         instructions=INSTRUCTIONS,
         tools=[fabric_tool],
+        # This module owns conversation history via AgentSession, so the service
+        # does not need to store it. Matches the public invocations sample.
+        default_options={"store": False},
     )
+
+
+# Built at import time: the hosting runtime imports this module to find `app`,
+# it does not execute main(). Anything created only inside main() would be dead
+# code in the deployed container.
+agent = build_agent()
+
+app = InvocationAgentServerHost()
+
+# In-memory session store, keyed by the session id the runtime assigns.
+# WARNING: lost on restart and not shared across replicas. Use durable storage
+# for anything beyond a sample.
+_sessions: dict[str, AgentSession] = {}
+
+
+@app.invoke_handler
+async def handle_invoke(request: Request) -> Response:
+    """Answer one invocation, streaming over SSE when the caller asks for it.
+
+    POST /invocations
+        {"message": "<question>", "stream": false}
+
+    The invocations protocol leaves the wire shape to the handler, unlike
+    Responses where the platform defines it. Session id comes from
+    request.state, set by the runtime from the ``agent_session_id`` query
+    parameter, the FOUNDRY_AGENT_SESSION_ID env var, or a fresh UUID
+    (azure/ai/agentserver/invocations/_invocation.py, _create_invocation_endpoint).
+    """
+    session_id = request.state.session_id
+    logger.info(
+        "invocation %s session=%s user=%s",
+        getattr(request.state, "invocation_id", None),
+        session_id,
+        getattr(request.state, "user_id", None) or "-",
+    )
+
+    data = await request.json()
+
+    stream = data.get("stream", False)
+    user_message = data.get("message")
+    if user_message is None:
+        error = "Missing 'message' in request"
+        if stream:
+            return StreamingResponse(content=error, status_code=400)
+        return Response(content=error, status_code=400)
+
+    session = _sessions.setdefault(session_id, AgentSession(session_id=session_id))
+
+    if stream:
+
+        async def stream_response() -> AsyncGenerator[str]:
+            async for update in agent.run(user_message, session=session, stream=True):
+                if update.text:
+                    yield update.text
+
+        return StreamingResponse(
+            stream_response(),
+            media_type="text/event-stream",
+            headers={"Cache-Control": "no-cache", "Connection": "keep-alive"},
+        )
+
+    response = await agent.run(user_message, session=session)
+    return JSONResponse({"response": response.text})
 
 
 def main() -> None:
     # PORT is injected by the Foundry hosting runtime; 8088 matches `azd ai agent run`.
     port = int(os.environ.get("PORT", "8088"))
-
-    ResponsesHostServer(build_agent()).run(port=port)
+    app.run(port=port)
 
 
 if __name__ == "__main__":
