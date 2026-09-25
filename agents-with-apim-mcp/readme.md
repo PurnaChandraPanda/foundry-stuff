@@ -156,7 +156,7 @@ Each toolbox-backed prompt agent additionally needs a separate Entra-authenticat
 | --- | --- |
 | Name | `APIM_MCP_CONNECTION_NAME`, e.g. `public-apim-mcp` or `private-route-apim-mcp` |
 | Target | Exact APIM MCP Server URL, including path and trailing slash |
-| Credential/header name | Usually `Ocp-Apim-Subscription-Key` |
+| Credential/header name | Usually `api-key` |
 | Credential value | Least-privilege APIM subscription key |
 
 Create it on demand with [create_mcp_connection.sh](./create_mcp_connection.sh).
