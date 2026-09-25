@@ -89,7 +89,7 @@ async def one_request(client, token, worker_number, turn):
             )
         }
     else:
-        payload = {"message": "hi"}
+        payload = {"message": f"hi {turn}{worker_number}"}
     params = {"api-version": API_VERSION}
     if PROTOCOL == "responses":
         payload["agent_session_id"] = EXISTING_AGENT_SESSION_ID
