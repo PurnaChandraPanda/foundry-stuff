@@ -23,7 +23,6 @@ USAGE:
 """
 
 import os
-os.
 from pprint import pprint
 from dotenv import load_dotenv
 from azure.identity import DefaultAzureCredential

@@ -24,6 +24,9 @@ conda deactivate
 conda remove --name v2foundry --all -y
 ```
 
+├── python sample_evaluations_builtin_with_inline_data.py
+├── python sample_evaluations_builtin_with_dataset_id.py
+
 ├── python sample_eval_catalog.py
 ├── python run_custom_evaluator_eval.py
 

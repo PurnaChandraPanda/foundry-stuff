@@ -25,7 +25,7 @@ MODEL_DEPLOYMENT = (
     or os.environ.get("AZURE_AI_MODEL_DEPLOYMENT_NAME", "")
 )
 
-CUSTOM_EVALUATOR_CATALOG_NAME = "my_custom_evaluator_code"
+CUSTOM_EVALUATOR_CATALOG_NAME = "my_custom_evaluator_code_based"
 
 POLL_INTERVAL_SECONDS = 5
 
