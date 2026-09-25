@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: hosted-agent
+services:
+    ai-project:
+        host: azure.ai.project
+        endpoint: ${FOUNDRY_PROJECT_ENDPOINT}
+    private-apim-direct-hosted:
+        project: ./src/private-apim-responses
+        host: azure.ai.agent
+        language: python
+        uses:
+            - ai-project
+        env:
+            AZURE_AI_MODEL_DEPLOYMENT_NAME: ${AZURE_AI_MODEL_DEPLOYMENT_NAME}
+            AZURE_AI_PROJECT_ENDPOINT: ${AZURE_AI_PROJECT_ENDPOINT}
+            APIM_ALLOWED_TOOLS: ${APIM_ALLOWED_TOOLS}
+            APIM_ALLOW_UNATTENDED: ${APIM_ALLOW_UNATTENDED}
+            APIM_MCP_URL: ${APIM_MCP_URL}
+            APIM_MCP_SERVER_LABEL: ${APIM_MCP_SERVER_LABEL}
+            APIM_MCP_CONNECTION_NAME: ${APIM_MCP_CONNECTION_NAME}
+        codeConfiguration:
+            dependencyResolution: remote_build
+            entryPoint: main.py
+            runtime: python_3_13
+        container:
+            resources:
+                cpu: "0.5"
+                memory: 1Gi
+        kind: hosted
+        name: private-apim-direct-hosted
+        protocols:
+            - protocol: responses
+              version: 2.0.0
+infra:
+    provider: microsoft.foundry

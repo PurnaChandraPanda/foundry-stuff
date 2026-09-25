@@ -1,0 +1,8 @@
+.env
+.env.*
+!.env.example
+.azure/
+.venv/
+__pycache__/
+*.pyc
+*.log

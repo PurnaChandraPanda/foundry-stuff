@@ -1,0 +1,9 @@
+# Direct-MCP dependencies verified in the user's existing .maf_venv.
+agent-framework-core==1.15.0
+agent-framework-foundry==1.11.0
+azure-ai-projects==2.3.0
+azure-identity==1.25.3
+mcp==1.29.1
+openai==2.54.0
+httpx==0.28.1
+python-dotenv==1.2.3

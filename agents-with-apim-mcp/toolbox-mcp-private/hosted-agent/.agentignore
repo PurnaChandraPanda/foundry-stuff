@@ -1,0 +1,10 @@
+.env
+.env.*
+.azure/
+.git/
+.venv/
+__pycache__/
+*.pyc
+*.log
+readme.md
+.agentserver/
