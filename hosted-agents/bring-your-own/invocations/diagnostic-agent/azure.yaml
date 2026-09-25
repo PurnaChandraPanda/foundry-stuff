@@ -7,7 +7,7 @@ services:
         host: azure.ai.agent
         language: python
         uses:
-            - project3738
+            - projectxee2
         codeConfiguration:
             dependencyResolution: remote_build
             entryPoint: main.py
@@ -21,7 +21,7 @@ services:
         protocols:
             - protocol: invocations
               version: 2.0.0
-    project3738:
+    projectxee2:
         host: azure.ai.project
         endpoint: ${AZURE_AI_PROJECT_ENDPOINT}
 infra:
