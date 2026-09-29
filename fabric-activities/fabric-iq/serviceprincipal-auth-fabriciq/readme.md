@@ -5,6 +5,8 @@ Activties are planned for local or prompt agents into Fabric data agent via Fabr
 [for SP user local or prompt agent] -> [toolbox] -> [fabric iq mcp server] -> [fabric data agent]
 ```
 
+As a pre-requiste, confirm that the SP user has `Foundry User` role on Foundry account/ project levels. Also, confirm that SP user has at least `reader` role at Fabric workspace level.
+
 ## 1. Create the Fabric IQ connection
 
 ```bash
