@@ -7,6 +7,8 @@ Activties are planned for local or prompt agents into Fabric data agent via Fabr
 
 As a pre-requisite, confirm that the SP user has `Foundry User` role on Foundry account/ project levels. Also, confirm that SP user has at least `reader` role at Fabric workspace level.
 
+Rename the `.env.example` as `.env` file and supply correct values for specified KEYs.
+
 ## 1. Create the Fabric IQ connection
 
 ```bash
