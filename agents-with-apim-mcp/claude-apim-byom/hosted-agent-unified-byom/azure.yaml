@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: hosted-agent-unified-byom
+services:
+    agent-claudebyom-responses:
+        project: ./src/claude-unified-byom
+        host: azure.ai.agent
+        language: python
+        uses:
+            - proj-default
+        codeConfiguration:
+            dependencyResolution: remote_build
+            entryPoint: main.py
+            runtime: python_3_13
+        container:
+            resources:
+                cpu: "0.5"
+                memory: 1Gi
+        env:
+            BYOM_MODEL: ${BYOM_MODEL}
+        kind: hosted
+        name: agent-claudebyom-responses
+        protocols:
+            - protocol: responses
+              version: 2.0.0
+    proj-default:
+        host: azure.ai.project
+        endpoint: ${FOUNDRY_PROJECT_ENDPOINT}
+infra:
+    provider: microsoft.foundry
