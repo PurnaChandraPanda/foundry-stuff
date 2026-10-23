@@ -51,18 +51,23 @@ Add your Claude backend
 Auth flow:
 
 ```text
-Python OpenAI chat completion client
-    │ APIM subscription key
+Python OpenAI SDK
+    │ OpenAI Chat Completions request
     ▼
-APIM Unified model API
-    │ Obtains an Entra token using its managed identity
-    │ Sends Authorization: Bearer <token>
-    | OpenAI to Anthropic translation
+APIM Unified API frontend
+    POST /llm/v1/chat/completions
+    │
+    │ Built-in request translation
     ▼
-Foundry Claude
-    │ Validates token and checks the identity's assigned roles
+Configured Anthropic backend
+    POST /anthropic/v1/messages
+    │
+    │ Anthropic response
     ▼
-Model response
+APIM translates the response back
+    │ OpenAI Chat Completions response
+    ▼
+Model response: response.choices[0].message.content
 ```
 
 ```bash
