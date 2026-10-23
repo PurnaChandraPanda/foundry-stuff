@@ -55,7 +55,7 @@ Python OpenAI SDK
     │ OpenAI Chat Completions request
     ▼
 APIM Unified API frontend
-    POST /llm/v1/chat/completions
+    POST ../chat/completions
     │
     │ Built-in request translation
     ▼
