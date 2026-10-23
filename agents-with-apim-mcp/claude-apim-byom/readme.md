@@ -16,6 +16,12 @@ python maf_foundry_claude.py
 On APIM level, create a new Foundry API. Pick the Foundry account name, set base path. On options, pick "Azure OpenAI" client compatibility option. 
 
 ```bash
+# [using httpx] Invoke APIM API that points to Fondry claude model messages api
+python httpx_apim_api_foundry_claude.py
+
+# [using openai] Invoke APIM API that points to Fondry claude model messages api
+python openai_apim_api_foundry_claude.py
+
 # Invoke APIM API that points to Fondry claude model messages api
 python apim_api_foundry_claude.py
 
