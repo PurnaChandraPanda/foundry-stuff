@@ -1,0 +1,7 @@
+# List of Python packages required for the project
+azure-identity
+langchain
+langchain-openai
+langgraph
+microsoft-opentelemetry
+python-dotenv
