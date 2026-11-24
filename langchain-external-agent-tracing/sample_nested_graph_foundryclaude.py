@@ -28,7 +28,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-BASE_URL = os.environ.get("Foundry_ANTHROPIC_ENDPOINT")
+BASE_URL = os.environ.get("FOUNDRY_ANTHROPIC_ENDPOINT")
 MODEL_NAME = os.environ.get("FOUNDRY_ANTHROPIC_DEPLOYMENT_NAME")
 
 credential = DefaultAzureCredential()
@@ -44,7 +44,7 @@ def main() -> None:
     def chat_model() -> AzureAIAnthropicChatModel:
         if not BASE_URL or not MODEL_NAME:
             raise ValueError(
-                "Set Foundry_ANTHROPIC_ENDPOINT and "
+                "Set FOUNDRY_ANTHROPIC_ENDPOINT and "
                 "FOUNDRY_ANTHROPIC_DEPLOYMENT_NAME before running this sample."
             )
         return AzureAIAnthropicChatModel(
