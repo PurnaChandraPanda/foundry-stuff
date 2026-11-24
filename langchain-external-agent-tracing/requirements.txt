@@ -1,6 +1,7 @@
 # List of Python packages required for the project
 azure-identity
 langchain
+langchain-azure-ai>=1.4.0
 langchain-openai
 langgraph
 microsoft-opentelemetry

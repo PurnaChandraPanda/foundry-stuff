@@ -34,6 +34,13 @@ python sample_langchain_instrumentation.py
 python sample_nested_graph.py
 ```
 
+- For Claude on Azure AI Foundry, set `Foundry_ANTHROPIC_ENDPOINT` and
+  `FOUNDRY_ANTHROPIC_DEPLOYMENT_NAME` in `.env`, then run:
+
+```bash
+python sample_nested_graph_foundryclaude.py
+```
+
 - All these runs would allow push events directly from wherever this code is running, into the sink of associated application insights. 
 
 - To review if anything is tracked in application insights, follow the KQL in applicaiton insights.
