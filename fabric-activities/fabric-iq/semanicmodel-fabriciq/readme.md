@@ -26,7 +26,7 @@ The provisioning caller needs connection write permissions on the project (for e
 Developers need the appropriate Foundry project roles to publish agents/toolboxes. Runtime users need Foundry access and access to the Fabric workspace and any data sources they query.
 See [OAuth identity passthrough prerequisites](https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/mcp-authentication#oauth-identity-passthrough).
 
-In Dev environment, it has `Python-3.13` installed. The package `agent-framework` is needed for remainder local machine testing.
+In Dev environment, it has `Python-3.13` installed. The package `agent-framework` is needed for remainder local machine testing. Also, have the `Azure CLI` installed in same local machine.
 
 ```
 pip install agent-framework>=1.26.0
@@ -41,7 +41,17 @@ No connector identifier is needed. The script provisions a `UserEntraToken` conn
 export MSYS_NO_PATHCONV=1
 
 # Sign in to TENANT_ID, then create or update the connection.
+## For git bash or linux bash users
 ./create_fabric_iq_connection.sh
+```
+
+(OR)
+
+```powershell
+# Sign in to TENANT_ID, then create or update the connection.
+## For powershell users
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+.\create_fabric_iq_connection.ps1
 ```
 
 The PUT URL is:
