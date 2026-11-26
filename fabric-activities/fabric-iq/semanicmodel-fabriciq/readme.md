@@ -50,7 +50,7 @@ export MSYS_NO_PATHCONV=1
 ```powershell
 # Sign in to TENANT_ID, then create or update the connection.
 ## For powershell users
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 .\create_fabric_iq_connection.ps1
 ```
 
