@@ -23,7 +23,7 @@ Copy [.env.example](.env.example) to `.env` if needed and populate the existing
 project/model and Fabric workspace/item IDs. 
 
 The provisioning caller needs connection write permissions on the project (for example, Foundry Project Manager); verification needs connection-read access.
-Developers need the appropriate Foundry project roles to publish agents/toolboxes. Runtime users need Foundry access and access to the Fabric ontology and any data sources they query.
+Developers need the appropriate Foundry project roles to publish agents/toolboxes. Runtime users need Foundry access and access to the Fabric workspace and any data sources they query.
 See [OAuth identity passthrough prerequisites](https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/mcp-authentication#oauth-identity-passthrough).
 
 In Dev environment, it has `Python-3.13` installed. The package `agent-framework` is needed for remainder local machine testing.
@@ -31,7 +31,6 @@ In Dev environment, it has `Python-3.13` installed. The package `agent-framework
 ```
 pip install agent-framework>=1.26.0
 ```
-
 
 ## 2. Create the connection with Azure CLI (`az rest`)
 
