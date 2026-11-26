@@ -28,6 +28,10 @@ See [OAuth identity passthrough prerequisites](https://learn.microsoft.com/en-us
 
 In Dev environment, it has `Python-3.13` installed. The package `agent-framework` is needed for remainder local machine testing.
 
+```
+pip install agent-framework>=1.26.0
+```
+
 
 ## 2. Create the connection with Azure CLI (`az rest`)
 
