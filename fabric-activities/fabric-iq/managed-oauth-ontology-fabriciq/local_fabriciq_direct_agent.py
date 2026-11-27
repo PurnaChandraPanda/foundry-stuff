@@ -64,8 +64,14 @@ USER_PROMPT = (
     # "If the user asks for distinct category values, state that ontology "
     # "metadata tools return schema only and a query-capable tool is required."
 
-    "What are the ontology properties and backing-table bindings for dim_customer, "
-    "including CustomerSegment"
+    # "What are the ontology properties and backing-table bindings for dim_customer, "
+    # "including CustomerSegment"
+    
+    "Call ask_ontology to read the data bound to dim_customer. "
+    "Return up to five distinct non-blank values of CustomerSegment. "
+    "Do not return column definitions or infer values from schema. "
+    "If the tool fails, report its error rather than saying no data exists."
+    "what are top customer sales reports about"
 
 
     # "List the movies with the highest ratings from MovieRating, showing film, year, and rating, sorted by rating descending."
