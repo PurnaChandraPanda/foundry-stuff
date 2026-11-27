@@ -10,7 +10,7 @@ from pathlib import Path
 
 from azure.core.credentials import TokenCredential
 from dotenv import load_dotenv
-from mcp.shared.exceptions import McpError
+from mcp.shared.exceptions import MCPError
 
 from fabric_iq_config import FABRIC_HOST, resolve_server_url
 
@@ -92,7 +92,7 @@ def verify_user_entra_connection(credential: TokenCredential) -> str:
 def report_oauth_error(error: BaseException) -> None:
     """Preserve consent links carried in MCP error data or SDK exception causes."""
     print(f"{type(error).__name__}: {error}", file=sys.stderr)
-    if isinstance(error, McpError) and error.error.data is not None:
+    if isinstance(error, MCPError) and error.error.data is not None:
         print(json.dumps(error.error.data, ensure_ascii=True), file=sys.stderr)
     if isinstance(error, urllib.error.HTTPError):
         detail = error.read().decode("utf-8", errors="replace")

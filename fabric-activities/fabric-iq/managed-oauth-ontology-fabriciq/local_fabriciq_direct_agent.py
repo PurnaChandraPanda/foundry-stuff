@@ -48,9 +48,25 @@ USER_PROMPT = (
     # "Complete this task now rather than listing all entities or offering "
     # "to perform another lookup. Do not invent movie records or rating values."
 
-    "Return the top 10 movies from MovieRating's backing table, movies_table. Show FILM, YEAR, and "
-    "RATING. Convert RATING from text to a numeric value, exclude invalid or missing ratings, and "
-    "sort numerically descending. Execute the query and return actual rows."
+
+    # "Describe the ontology entity for customer data. "
+    # "Call list_ontology_entities without a name filter. "
+    # "Identify the entity that represents dim_customer, "
+    # "report its properties and backing-table bindings, "
+    # "and identify whether CustomerSegment is a property. "
+    # "Do not claim that actual category values were returned."
+    
+    # "Call list_ontology_entities using the exact entity name dim_customer. "
+    # "Report the entity description, properties, data types, keys, and "
+    # "backing-table/backing-column bindings. "
+    # "Specifically identify CustomerSegment and dim_customer.CustomerSegment. "
+    # "Do not invent or estimate actual CustomerSegment values. "
+    # "If the user asks for distinct category values, state that ontology "
+    # "metadata tools return schema only and a query-capable tool is required."
+
+    "What are the ontology properties and backing-table bindings for dim_customer, "
+    "including CustomerSegment"
+
 
     # "List the movies with the highest ratings from MovieRating, showing film, year, and rating, sorted by rating descending."
 )

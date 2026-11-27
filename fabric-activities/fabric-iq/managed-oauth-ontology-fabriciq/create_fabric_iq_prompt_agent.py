@@ -28,10 +28,11 @@ SERVER_URL = resolve_server_url()
 # The model only calls the tool when it recognizes the question as a data question,
 # so name the domain explicitly rather than saying "use tools when helpful".
 INSTRUCTIONS = (
-    "You are a helpful assistant with access to your organization's Microsoft Fabric "
-    "data through Fabric IQ. Use the Fabric IQ tool for any question about business "
-    "data, entities, metrics, or organizational knowledge. Ground every answer in the "
-    "data the tool returns and state the numbers you used."
+    "You have access to a Fabric IQ ontology. "
+    "Use list_ontology_entities and list_ontology_rules to return entity metadata, "
+    "properties, relationships, and backing-table bindings. "
+    "Do not calculate totals or report distinct values unless a tool explicitly "
+    "returns backing-table rows."
 )
 
 

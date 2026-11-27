@@ -1,6 +1,7 @@
 """Query the prompt agent created by `create_fabric_iq_prompt_agent.py`."""
 
 import argparse
+import json
 import shlex
 import sys
 
@@ -24,6 +25,26 @@ DEFAULT_QUERY = "Describe MovieRating using the ontology entity metadata tool."
 def _explain_fabric_iq_error(error: APIStatusError) -> None:
     message = str(error)
     print(f"\nFabric IQ tool call failed:\n  {message}\n", file=sys.stderr)
+    print(f"HTTP status: {error.status_code}", file=sys.stderr)
+    if getattr(error, "request_id", None):
+        print(f"Request ID: {error.request_id}", file=sys.stderr)
+
+    response = getattr(error, "response", None)
+    if response is not None:
+        try:
+            print(f"Response body: {response.text}", file=sys.stderr)
+        except Exception:
+            pass
+
+    body = getattr(error, "body", None)
+    if body is not None:
+        print("API error body:", file=sys.stderr)
+        if hasattr(body, "model_dump"):
+            print(body.model_dump_json(indent=2), file=sys.stderr)
+        elif isinstance(body, (dict, list)):
+            print(json.dumps(body, indent=2, ensure_ascii=True), file=sys.stderr)
+        else:
+            print(str(body), file=sys.stderr)
 
     lowered = message.lower()
     if "consent_required" in lowered or "consent" in lowered or "-32006" in lowered:
